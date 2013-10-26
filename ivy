@@ -7,5 +7,5 @@ fi
 
 IVY_JAR=$(find $IVY_HOME -iname "*ivy*.jar")
 
-java -jar ${IVY_HOME}/${IVY_JAR} $@
+java -jar ${IVY_JAR} $@
 exit $?
