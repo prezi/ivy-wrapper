@@ -7,5 +7,20 @@ fi
 
 IVY_JAR=$(find $IVY_HOME -iname "*ivy*.jar")
 
-java -jar ${IVY_JAR} $@
+# extract -D command line arguments to dedicated list of properties
+# Java expects -D arguments before Main declaration
+properties=()
+arguments=()
+
+JAVA_PROPERTY_REGEX='^-D(.*)+=(.*)+$'
+
+for argument in $@; do
+	if [[ "$argument" =~ $JAVA_PROPERTY_REGEX ]]; then
+		properties+=($argument)
+	else
+		arguments+=($argument)
+	fi
+done
+
+java ${properties[@]} -jar ${IVY_JAR} ${arguments[@]}
 exit $?
