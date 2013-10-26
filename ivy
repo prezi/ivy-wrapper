@@ -5,9 +5,7 @@ if [[ -z "${IVY_HOME}" ]]; then
   exit 1;
 fi
 
-pushd $IVY_HOME >> /dev/null
-IVY_JAR=$(find *ivy*.jar)
-popd >> /dev/null
+IVY_JAR=$(find $IVY_HOME -iname "*ivy*.jar")
 
 java -jar ${IVY_HOME}/${IVY_JAR} $@
 exit $?
