@@ -42,4 +42,4 @@ for argument in "$@"; do
 	fi
 done
 
-exec java "${properties[@]-}" -jar "${IVY_JAR}" "${arguments[@]-}"
+exec java ${properties[@]-} -jar "${IVY_JAR}" ${arguments[@]-}
