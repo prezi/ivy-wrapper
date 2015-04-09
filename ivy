@@ -1,20 +1,40 @@
 #!/bin/bash
 
-if [[ -z "${IVY_HOME}" ]]; then
-  echo "IVY_HOME must be set"
+set -ueo pipefail
+
+IVY_DEFAULT_VERSION="${IVY_DEFAULT_VERSION:-2.4.0}"
+IVY_HOME="${IVY_HOME:-}"
+
+if [[ -z "${IVY_HOME}" && -z "${IVY_DEFAULT_VERSION}" ]]; then
+  echo "IVY_HOME must be set if there is no IVY_DEFAULT_VERSION"
   exit 1;
 fi
 
-IVY_JAR=$(find $IVY_HOME -iname "*ivy*.jar")
+if [[ -z "${IVY_HOME}" ]]; then
+    IVY_HOME="${HOME}/.ivy2"
+    if [[ ! -f "${IVY_HOME}/ivy-${IVY_DEFAULT_VERSION}.jar" ]]; then
+        mkdir -p "${IVY_HOME}"
+        cd "${IVY_HOME}"
+        curl -s -O "https://prezidevrepo.s3.amazonaws.com/jars/ivy-${IVY_DEFAULT_VERSION}.jar"
+        cd - &>/dev/null
+    fi
+fi
+
+IVY_JAR=$(if [[ -f "${IVY_HOME}" ]]; then
+    printf "${IVY_HOME}"
+else
+    ls "${IVY_HOME}/"*ivy*.jar | head -n 1
+fi)
 
 # extract -D command line arguments to dedicated list of properties
 # Java expects -D arguments before Main declaration
-properties=()
-arguments=()
+
+typeset -a properties=()
+typeset -a arguments=()
 
 JAVA_PROPERTY_REGEX='^-D(.*)+=(.*)+$'
 
-for argument in $@; do
+for argument in "$@"; do
 	if [[ "$argument" =~ $JAVA_PROPERTY_REGEX ]]; then
 		properties+=($argument)
 	else
@@ -22,5 +42,6 @@ for argument in $@; do
 	fi
 done
 
-java ${properties[@]} -jar ${IVY_JAR} ${arguments[@]}
-exit $?
+# without the next line, we fail if there are no elements in either array
+set +u
+exec java "${properties[@]}" -jar "${IVY_JAR}" "${arguments[@]}"
