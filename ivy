@@ -42,6 +42,4 @@ for argument in "$@"; do
 	fi
 done
 
-# without the next line, we fail if there are no elements in either array
-set +u
-exec java "${properties[@]}" -jar "${IVY_JAR}" "${arguments[@]}"
+exec java "${properties[@]-}" -jar "${IVY_JAR}" "${arguments[@]-}"
