@@ -4,6 +4,7 @@ set -ueo pipefail
 
 IVY_DEFAULT_VERSION="${IVY_DEFAULT_VERSION:-2.4.0}"
 IVY_HOME="${IVY_HOME:-}"
+IVY_OPTS="${IVY_OPTS:-}"
 
 if [[ -z "${IVY_HOME}" && -z "${IVY_DEFAULT_VERSION}" ]]; then
   echo "IVY_HOME must be set if there is no IVY_DEFAULT_VERSION"
@@ -42,4 +43,4 @@ for argument in "$@"; do
 	fi
 done
 
-exec java ${properties[@]-} -jar "${IVY_JAR}" ${arguments[@]-}
+exec java ${properties[@]-} "${IVY_OPTS}" -jar "${IVY_JAR}" ${arguments[@]-}
